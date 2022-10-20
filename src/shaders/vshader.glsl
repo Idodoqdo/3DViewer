@@ -5,20 +5,11 @@ precision mediump float;
 #endif
 
 uniform mat4 mvp_matrix;
-
-attribute vec4 a_position;
-//attribute vec2 a_texcoord;
-
-//varying vec2 v_texcoord;
-
-//! [0]
+attribute vec4 vertex_pos;
+uniform vec4 color;
+varying vec4 frag_color;
 void main()
 {
-    // Calculate vertex position in screen space
-    gl_Position = mvp_matrix * a_position;
-
-    // Pass texture coordinate to fragment shader
-    // Value will be automatically interpolated to fragments inside polygon faces
-//    v_texcoord = a_texcoord;
+    gl_Position = mvp_matrix * vertex_pos;
+    frag_color = color;
 }
-//! [0]

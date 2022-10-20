@@ -125,12 +125,6 @@ TEST(CREATION, CONSTRUCTORS_MOVE) {
     ASSERT_MATRIX(matrix2, result);
 }
 
-TEST(CREATION, CONSTRUCTORS_EXCEPTION) {
-    EXPECT_THROW({
-        S21Matrix matrix(-1, 5);
-    }, std::invalid_argument);
-}
-
 TEST(CREATION, CONSTRUCTORS_EXCEPTION_2) {
     EXPECT_THROW({
         S21Matrix matrix(1, 0);

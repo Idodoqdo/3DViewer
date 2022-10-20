@@ -2,6 +2,7 @@
 #include "mainwindow.h"
 
 #include <QMessageBox>
+#include <QTemporaryDir>
 #include <limits>
 
 #include "ui_mainwindow.h"
@@ -13,6 +14,7 @@ MainWindow::MainWindow(QWidget *parent)
 }
 
 void MainWindow::SaveSettings() {
+  settings_->SaveElement(*ui->projection_combobox);
   settings_->SaveElement(*ui->edges_thickness_slider);
   settings_->SaveElement(*ui->edges_type_combobox);
   settings_->SaveElement(*ui->vertices_size_slider);
@@ -34,6 +36,18 @@ void MainWindow::LoadSettings() {
   settings_->LoadVariable("background_color", &bg_color_);
   settings_->LoadVariable("edges_color", &edges_color_);
   settings_->LoadVariable("vertices_color", &vertices_color_);
+  LoadDefaultFigure();
+  settings_->LoadElement(ui->projection_combobox);
+}
+
+void MainWindow::LoadDefaultFigure() {
+  QTemporaryDir tempDir;
+  if (tempDir.isValid()) {
+    const QString tempFile = tempDir.path() + "/teapot.obj";
+    if (QFile::copy(":/teapot", tempFile)) {
+      OpenFile(tempFile);
+    }
+  }
 }
 
 void MainWindow::ApplySettings() {
@@ -50,7 +64,9 @@ void MainWindow::ApplySettings() {
 void MainWindow::OnWidgetLoad() {
   InitValidators();
   ConnectToSignals();
-  settings_ = new ViewerSettings(QCoreApplication::applicationDirPath() + "/settings.ini", QSettings::IniFormat, this);
+  settings_ = new ViewerSettings(
+      QCoreApplication::applicationDirPath() + "/settings.ini",
+      QSettings::IniFormat, this);
   LoadSettings();
   ApplySettings();
 }
@@ -74,59 +90,59 @@ void MainWindow::InitValidators() {
 void MainWindow::ConnectToSignals() {
   connect(ui->file_open_pushbutton, &QPushButton::clicked, this,
           &MainWindow::OnOpenFilePressed);
-  connect(ui->translate_x_slider, &QSlider::sliderMoved, this, [=]() {
+  connect(ui->translate_x_slider, &QSlider::valueChanged, this, [=]() {
     this->OnChange(ui->translate_x_lineedit, ui->translate_x_slider,
                    &ViewerWidget::TranslateFigureX);
   });
-  connect(ui->translate_x_lineedit, &QLineEdit::textEdited, this, [=]() {
+  connect(ui->translate_x_lineedit, &QLineEdit::editingFinished, this, [=]() {
     this->OnChange(ui->translate_x_lineedit, ui->translate_x_slider,
                    &ViewerWidget::TranslateFigureX);
   });
-  connect(ui->translate_y_slider, &QSlider::sliderMoved, this, [=]() {
+  connect(ui->translate_y_slider, &QSlider::valueChanged, this, [=]() {
     this->OnChange(ui->translate_y_lineedit, ui->translate_y_slider,
                    &ViewerWidget::TranslateFigureY);
   });
-  connect(ui->translate_y_lineedit, &QLineEdit::textEdited, this, [=]() {
+  connect(ui->translate_y_lineedit, &QLineEdit::editingFinished, this, [=]() {
     this->OnChange(ui->translate_y_lineedit, ui->translate_y_slider,
                    &ViewerWidget::TranslateFigureY);
   });
-  connect(ui->translate_z_slider, &QSlider::sliderMoved, this, [=]() {
+  connect(ui->translate_z_slider, &QSlider::valueChanged, this, [=]() {
     this->OnChange(ui->translate_z_lineedit, ui->translate_z_slider,
                    &ViewerWidget::TranslateFigureZ);
   });
-  connect(ui->translate_z_lineedit, &QLineEdit::textEdited, this, [=]() {
+  connect(ui->translate_z_lineedit, &QLineEdit::editingFinished, this, [=]() {
     this->OnChange(ui->translate_z_lineedit, ui->translate_z_slider,
                    &ViewerWidget::TranslateFigureZ);
   });
-  connect(ui->rotate_x_slider, &QSlider::sliderMoved, this, [=]() {
+  connect(ui->rotate_x_slider, &QSlider::valueChanged, this, [=]() {
     this->OnChange(ui->rotate_x_lineedit, ui->rotate_x_slider,
                    &ViewerWidget::RotateFigureX);
   });
-  connect(ui->rotate_x_lineedit, &QLineEdit::textEdited, this, [=]() {
+  connect(ui->rotate_x_lineedit, &QLineEdit::editingFinished, this, [=]() {
     this->OnChange(ui->rotate_x_lineedit, ui->rotate_x_slider,
                    &ViewerWidget::RotateFigureX);
   });
-  connect(ui->rotate_y_slider, &QSlider::sliderMoved, this, [=]() {
+  connect(ui->rotate_y_slider, &QSlider::valueChanged, this, [=]() {
     this->OnChange(ui->rotate_y_lineedit, ui->rotate_y_slider,
                    &ViewerWidget::RotateFigureY);
   });
-  connect(ui->rotate_y_lineedit, &QLineEdit::textEdited, this, [=]() {
+  connect(ui->rotate_y_lineedit, &QLineEdit::editingFinished, this, [=]() {
     this->OnChange(ui->rotate_y_lineedit, ui->rotate_y_slider,
                    &ViewerWidget::RotateFigureY);
   });
-  connect(ui->rotate_z_slider, &QSlider::sliderMoved, this, [=]() {
+  connect(ui->rotate_z_slider, &QSlider::valueChanged, this, [=]() {
     this->OnChange(ui->rotate_z_lineedit, ui->rotate_z_slider,
                    &ViewerWidget::RotateFigureZ);
   });
-  connect(ui->rotate_z_lineedit, &QLineEdit::textEdited, this, [=]() {
+  connect(ui->rotate_z_lineedit, &QLineEdit::editingFinished, this, [=]() {
     this->OnChange(ui->rotate_z_lineedit, ui->rotate_z_slider,
                    &ViewerWidget::RotateFigureZ);
   });
-  connect(ui->scale_slider, &QSlider::sliderMoved, this, [=]() {
+  connect(ui->scale_slider, &QSlider::valueChanged, this, [=]() {
     this->OnChange(ui->scale_lineedit, ui->scale_slider,
                    &ViewerWidget::ScaleFigure);
   });
-  connect(ui->scale_lineedit, &QLineEdit::textEdited, this, [=]() {
+  connect(ui->scale_lineedit, &QLineEdit::editingFinished, this, [=]() {
     this->OnChange(ui->scale_lineedit, ui->scale_slider,
                    &ViewerWidget::ScaleFigure);
   });
@@ -138,21 +154,20 @@ void MainWindow::ConnectToSignals() {
           &MainWindow::OnEdgeTypeChange);
   connect(ui->edges_color_pushbutton, &QPushButton::clicked, this,
           &MainWindow::OnEdgeColorPressed);
-  connect(ui->edges_thickness_slider, &QSlider::sliderMoved, this,
+  connect(ui->edges_thickness_slider, &QSlider::valueChanged, this,
           &MainWindow::OnEdgeThicknessChange);
   connect(ui->vertices_type_combobox, &QComboBox::currentIndexChanged, this,
           &MainWindow::OnVertexTypeChange);
   connect(ui->vertices_color_pushbutton, &QPushButton::clicked, this,
           &MainWindow::OnVertexColorPressed);
-  connect(ui->vertices_size_slider, &QSlider::sliderMoved, this,
+  connect(ui->vertices_size_slider, &QSlider::valueChanged, this,
           &MainWindow::OnVertexSizeChange);
   connect(ui->printscreen_pushbutton, &QPushButton::clicked, this,
           &MainWindow::OnMakeScreenshootPressed);
   connect(ui->gif_pushbutton, &QPushButton::clicked, this,
           &MainWindow::OnMakeGifPressed);
-  // TODO(lwolmer): Change icon back
-  // connect(opengl_window_, &OpenGLWindow::GifRecorded, this, [this]()
-  // {ui->gif_pushbutton->setText("Capture gif animation");});
+  connect(ui->gl_widget, &ViewerWidget::GifRecorded, this,
+          [this]() { ui->gif_pushbutton->setIcon(QIcon(":gif_icon")); });
 }
 
 void MainWindow::SetLabelPixmap(QLabel *label, QColor color) {
@@ -164,16 +179,17 @@ void MainWindow::SetLabelPixmap(QLabel *label, QColor color) {
 void MainWindow::OpenFile(QString path) {
   try {
     gl_widget_->LoadModel(path);
-    void LoadModel(QString path);
     QFileInfo fullName(path);
     ui->file_name_output_label->setText(fullName.fileName());
     ui->num_of_vert_output_label->setText(
         QString::number(gl_widget_->GetFigureVerticesCount(0)));
     ui->num_of_edges_output_label->setText(
         QString::number(gl_widget_->GetFigureEdgesCount(0)));
-    ApplySettings();
   } catch (const std::exception &e) {
-    QMessageBox::critical(this, "Error", e.what(), QMessageBox::Ok);
+    QMessageBox::critical(
+        this, "Error",
+        QString("Error while openning file:\n\n").append(e.what()),
+        QMessageBox::Ok);
   }
 }
 
@@ -182,19 +198,29 @@ void MainWindow::OnOpenFilePressed() {
                                                   QDir::homePath(),
                                                   tr("Object Files (*.obj)"));
   OpenFile(fileName);
+  if (!fileName.isEmpty()) SetDefaultSliders();
+}
+
+void MainWindow::SetDefaultSliders() {
+  ui->translate_x_slider->setValue(0);
+  ui->translate_y_slider->setValue(0);
+  ui->translate_z_slider->setValue(0);
+  ui->rotate_x_slider->setValue(0);
+  ui->rotate_y_slider->setValue(0);
+  ui->rotate_z_slider->setValue(0);
+  ui->scale_slider->setValue(1);
 }
 
 void MainWindow::OnChange(QLineEdit *line, QSlider *slider,
                           void (ViewerWidget::*ptrFunc)(float)) {
-  if (!gl_widget_->isEmpty()) {
+  if (gl_widget_->FigureLoaded()) {
     if (line->isModified()) {
-      slider->setValue(line->text().toInt());
       line->setModified(false);
+      slider->setValue(static_cast<int>(line->text().toFloat() * 10));
     } else {
-      line->setText(QString::number(slider->value()));
+      line->setText(QString::number(static_cast<float>(slider->value()) / 10));
     }
     (gl_widget_->*ptrFunc)(line->text().toFloat());
-    gl_widget_->update();
   } else {
     QMessageBox::critical(this, "Error", "No model loaded", QMessageBox::Ok);
   }
@@ -215,13 +241,11 @@ void MainWindow::OnBGColorPressed() {
 void MainWindow::OnEdgeTypeChange() {
   int type = ui->edges_type_combobox->currentIndex();
   gl_widget_->SetEdgesType(type);
-  gl_widget_->update();
 }
 
 void MainWindow::OnEdgeThicknessChange() {
-  int size = ui->edges_thickness_slider->value();
+  float size = static_cast<float>(ui->edges_thickness_slider->value());
   gl_widget_->SetEdgesThickness(size);
-  gl_widget_->update();
 }
 
 void MainWindow::OnEdgeColorPressed() {
@@ -234,7 +258,6 @@ void MainWindow::OnEdgeColorPressed() {
 void MainWindow::OnVertexTypeChange() {
   int type = ui->vertices_type_combobox->currentIndex();
   gl_widget_->SetVerticesType(type);
-  gl_widget_->update();
 }
 
 void MainWindow::OnVertexColorPressed() {
@@ -245,9 +268,8 @@ void MainWindow::OnVertexColorPressed() {
 }
 
 void MainWindow::OnVertexSizeChange() {
-  int size = ui->vertices_size_slider->value();
+  float size = static_cast<float>(ui->vertices_size_slider->value());
   gl_widget_->SetVerticesSize(size);
-  gl_widget_->update();
 }
 
 void MainWindow::OnBGColorChange() {
@@ -265,14 +287,11 @@ void MainWindow::OnVertexColorChange() {
   gl_widget_->SetVerticesColor(vertices_color_);
 }
 
-void MainWindow::OnMakeScreenshootPressed() {
-  QMessageBox::critical(this, "Error", "НЕТУ РЕАЛИЗАЦИИ, пока что...",
-                        QMessageBox::Ok);
-}
+void MainWindow::OnMakeScreenshootPressed() { gl_widget_->TakeScreenshot(); }
 
 void MainWindow::OnMakeGifPressed() {
-  QMessageBox::critical(this, "Error", "НЕТУ РЕАЛИЗАЦИИ, пока что...",
-                        QMessageBox::Ok);
+  ui->gif_pushbutton->setIcon(QIcon(":rec_icon"));
+  gl_widget_->StartGifRecording();
 }
 
 MainWindow::~MainWindow() {

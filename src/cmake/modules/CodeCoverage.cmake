@@ -112,12 +112,12 @@ FUNCTION(SETUP_TARGET_FOR_COVERAGE _targetname _testrunner _outputname)
 		COMMAND ${_testrunner} ${ARGV3}
 		
 		# Capturing lcov counters and generating report
-		COMMAND ${LCOV_PATH} --gcov-tool ${CMAKE_CURRENT_SOURCE_DIR}/gcov_for_clang.sh --directory . --capture --output-file ${_outputname}.info
-		COMMAND ${LCOV_PATH} --gcov-tool ${CMAKE_CURRENT_SOURCE_DIR}/gcov_for_clang.sh --remove ${_outputname}.info --output-file ${_outputname}.info.cleaned 'build/*' '*/boost/*' '*/gtest/*' 'tests/*' '*/tests/*' '/usr/*' '*autogen*'
-		COMMAND ${GENHTML_PATH} -o ${_outputname} ${_outputname}.info.cleaned
-		COMMAND ${CMAKE_COMMAND} -E remove ${_outputname}.info ${_outputname}.info.cleaned
+		COMMAND ${LCOV_PATH} --gcov-tool ${CMAKE_CURRENT_SOURCE_DIR}/gcov_for_clang.sh --directory . --capture --output-file ${CMAKE_BINARY_DIR}/${_outputname}.info
+		COMMAND ${LCOV_PATH} --gcov-tool ${CMAKE_CURRENT_SOURCE_DIR}/gcov_for_clang.sh --remove ${CMAKE_BINARY_DIR}/${_outputname}.info --output-file ${CMAKE_BINARY_DIR}/${_outputname}.info.cleaned 'build/*' '*/boost/*' '*/v1/*' '*/gtest/*' 'tests/*' '*/tests/*' '/usr/*' '*autogen*'
+		COMMAND ${GENHTML_PATH} -o ${CMAKE_BINARY_DIR}/${_outputname} ${CMAKE_BINARY_DIR}/${_outputname}.info.cleaned
+		COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_BINARY_DIR}/${_outputname}.info ${CMAKE_BINARY_DIR}/${_outputname}.info.cleaned
 		
-		WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 		COMMENT "Resetting code coverage counters to zero.\nProcessing code coverage counters and generating report."
 	)
 	

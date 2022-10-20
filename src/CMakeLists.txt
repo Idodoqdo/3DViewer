@@ -31,10 +31,33 @@ endif(ENABLE_CODE_ANALYSIS)
 
 #############################################################
 #                                                           #
+#                     Dependencies                          #
+#                                                           #
+#############################################################
+#############################################################
+#                     GTEST COMPILE                         #
+#############################################################
+message("-- Added GTest target from source")
+if (NOT TARGET gtest_main)
+    unset(CMAKE_CXX_FLAGS)
+    unset(CMAKE_CXX_FLAGS_DEBUG)
+    set(_flag_sync_required TRUE)
+    add_subdirectory(googletest EXCLUDE_FROM_ALL)
+endif ()
+include_directories(${gtest_SOURCE_DIR}/include ${gmock_SOURCE_DIR}/include)
+set(GTEST_FOUND TRUE)
+#############################################################
+#                         OTHERS                            #
+#############################################################
+add_subdirectory(s21_matrixplus)
+add_subdirectory(QtGifImage)
+#############################################################
+#                                                           #
 #                      EXECUTABLE                           #
 #                                                           #
 #############################################################
 set(PROJECT_NAME "3dviewer")
+
 cmake_minimum_required(VERSION 3.5)
 project(${PROJECT_NAME} VERSION 1.0 LANGUAGES CXX)
 include (CTest)
@@ -85,6 +108,7 @@ elseif(WIN32)
 endif (UNIX)
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt${QT_VERSION_MAJOR}::OpenGL Qt${QT_VERSION_MAJOR}::OpenGLWidgets ${OPENGL_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} PRIVATE s21_matrix_oop)
+target_link_libraries(${PROJECT_NAME} PRIVATE qtgif)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER ${PROJECT_NAME}
@@ -94,9 +118,11 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     WIN32_EXECUTABLE TRUE
 )
 
-
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
+    ${gif_from_src_SOURCE_DIR}
+    ${qtgif_SOURCE_DIR}
+    
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/views
     ${CMAKE_CURRENT_SOURCE_DIR}/models
@@ -118,28 +144,6 @@ set(CMAKE_AUTOUIC OFF)
 set(CMAKE_AUTOMOC OFF)
 set(CMAKE_AUTORCC OFF)
 
-
-#############################################################
-#                                                           #
-#                     GTEST COMPILE                         #
-#                                                           #
-#############################################################
-message("-- Added GTest target from source")
-if (NOT TARGET gtest_main)
-    unset(CMAKE_CXX_FLAGS)
-    unset(CMAKE_CXX_FLAGS_DEBUG)
-    set(_flag_sync_required TRUE)
-    add_subdirectory(googletest EXCLUDE_FROM_ALL)
-endif ()
-include_directories(${gtest_SOURCE_DIR}/include ${gmock_SOURCE_DIR}/include)
-set(GTEST_FOUND TRUE)
-
-#############################################################
-#                                                           #
-#                       s21_Matrix                          #
-#                                                           #
-#############################################################
-add_subdirectory(s21_matrixplus)
 #############################################################
 #                                                           #
 #                         TESTING                           #

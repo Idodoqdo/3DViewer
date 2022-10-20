@@ -10,11 +10,14 @@ namespace s21 {
 class MVPMatrix {
  public:
   MVPMatrix() {
-    SetIdentity(matrix);
-    SetIdentity(mat_rotX);
-    SetIdentity(mat_rotY);
-    SetIdentity(mat_rotZ);
-    SetIdentity(mat_scale);
+    S21Matrix ind = S21Matrix::GetIdentityMatrix(4);
+    result_matrix_ = ind;
+    mat_rotX_ = ind;
+    mat_rotY_ = ind;
+    mat_rotZ_ = ind;
+    mat_scale_ = ind;
+    mat_offset_ = ind;
+    mat_move_ = ind;
   };
   void RotateX(float angleX);
   void RotateY(float angleY);
@@ -23,14 +26,13 @@ class MVPMatrix {
   void TranslateY(float shiftY);
   void TranslateZ(float shiftZ);
   void Scale(float scale_factor);
-  void Tranform();
-  s21::S21Matrix GetMVPMatrix() { return matrix; };
+  void SetOffset(float offsetX, float offsetY, float offsetZ);
+  s21::S21Matrix GetMVPMatrix() { return result_matrix_; };
 
  private:
-  s21::S21Matrix matrix, mat_rotX, mat_rotY, mat_rotZ, mat_scale;
-  void SetPosition();
-  void SetIdentity(s21::S21Matrix& matrix);
-  std::vector<float> position{0, 0, 0};
+  void Transform();
+  s21::S21Matrix result_matrix_, mat_rotX_, mat_rotY_, mat_rotZ_, mat_scale_,
+      mat_offset_, mat_move_;
 };
 }  // namespace s21
 

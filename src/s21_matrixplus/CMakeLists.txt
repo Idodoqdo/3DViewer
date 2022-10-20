@@ -59,10 +59,11 @@ if (GTEST_FOUND)
     set(CMAKE_CXX_FLAGS "-Werror -Wall -Wextra -Wpedantic -Wcast-align -Wcast-qual -Wconversion -Wctor-dtor-privacy -Wenum-compare -Wfloat-equal -Wnon-virtual-dtor -Wold-style-cast -Woverloaded-virtual -Wredundant-decls -Wsign-conversion -Wsign-promo -g ${CMAKE_CXX_FLAGS}")
     set(CMAKE_CXX_FLAGS_DEBUG "-Wno-deprecated-register -O0 -g -Werror -Wall -Wextra -Wpedantic -Wcast-align -Wcast-qual -Wconversion -Wctor-dtor-privacy -Wenum-compare -Wfloat-equal -Wnon-virtual-dtor -Wold-style-cast -Woverloaded-virtual -Wredundant-decls -Wsign-conversion -Wsign-promo ${CMAKE_CXX_FLAGS_DEBUG}")
     set(TEST_SRC tests/tests.cpp)
+    set(CMAKE_INCLUDE_CURRENT_DIR ON)
     add_executable(unit_tests_matrix ${TEST_SRC})
     set_property(TARGET unit_tests_matrix PROPERTY CXX_STANDARD 17)
     set_property(TARGET unit_tests_matrix PROPERTY CMAKE_CXX_STANDARD_REQUIRED ON)
-
+    
     set_property(TARGET unit_tests_matrix PROPERTY THREADS_PREFER_PTHREAD_FLAG ON)
     find_package(Threads REQUIRED)
     target_link_libraries(unit_tests_matrix

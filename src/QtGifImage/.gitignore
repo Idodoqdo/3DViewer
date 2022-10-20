@@ -43,3 +43,5 @@ lib/*
 
 *.zip
 *.xlsx
+
+qtgif_autogen

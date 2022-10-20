@@ -1,17 +1,18 @@
 // Copyright 2022 <lwolmer, jgerrick, lshiela>
 #include "viewer_widget.h"
 
+#include <QImage>
+#include <QImageWriter>
 #include <QMouseEvent>
 #include <cmath>
+#include <memory>
 
 #include "figure.h"
 
 ViewerWidget::~ViewerWidget() { figures_.clear(); }
 
 ViewerWidget::ViewerWidget(QWidget *parent, Qt::WindowFlags f)
-    : QOpenGLWidget(parent, f) {
-  // Generate 2 VBOs
-}
+    : QOpenGLWidget(parent, f) {}
 
 void ViewerWidget::initializeGL() {
   initializeOpenGLFunctions();
@@ -20,10 +21,38 @@ void ViewerWidget::initializeGL() {
   initShaders();
 }
 
-int ViewerWidget::GetFigureEdgesCount(size_t index) const {
+void ViewerWidget::GifCreation() {
+  if (is_recording_) {
+    if (gif_frame_count_ < 50) {
+      QImage screen = this->grabFramebuffer();
+      gif_.addFrame(screen);
+      gif_frame_count_++;
+    } else {
+      is_recording_ = false;
+      gif_.setDefaultDelay(100);
+      QString fileName = QFileDialog::getSaveFileName(
+          this, tr("Save File"), QDir::homePath() + "/animation.gif",
+          tr("Gif (*.gif)"));
+      if (fileName.length()) gif_.save(fileName);
+      gif_ = QGifImage(QSize(640, 480));
+      gif_frame_count_ = 0;
+      emit GifRecorded();
+    }
+  }
+}
+
+void ViewerWidget::TakeScreenshot() {
+  QImage screen = this->grabFramebuffer();
+  QString fileName = QFileDialog::getSaveFileName(
+      this, tr("Save File"), QDir::homePath() + "/screenshoot.jpg",
+      tr("JPEG (*.jpg *.jpeg);;BMP (*.bmp)"));
+  if (fileName.length()) screen.save(fileName);
+}
+
+size_t ViewerWidget::GetFigureEdgesCount(size_t index) const {
   return figures_.at(index).get()->GetEdgesCount();
 }
-int ViewerWidget::GetFigureVerticesCount(size_t index) const {
+size_t ViewerWidget::GetFigureVerticesCount(size_t index) const {
   return figures_.at(index).get()->GetVerticesCount();
 }
 
@@ -53,6 +82,24 @@ void ViewerWidget::RotateFigureZ(float rotateZ) {
 
 void ViewerWidget::ScaleFigure(float scale) { figures_.at(0)->Scale(scale); }
 
+void ViewerWidget::SetupProjection(int width, int height) {
+  float aspect = static_cast<float>(qreal(width) / qreal(height ? height : 1));
+
+  // Set near plane to 3.0, far plane to 7.0, field of view 45 degrees
+  const float zNear = 0.1f, zFar = 10000.0, fov = 70.0;
+  // Reset projection
+  projection_.setToIdentity();
+
+  // Set projection
+  if (projection_type_ == 0) {
+    projection_.perspective(fov, aspect, zNear, zFar);
+  } else {
+    float window = figures_.at(0)->GetWindowSize();
+    projection_.ortho(-aspect * window, aspect * window, -window, window,
+                      -window * 10, window * 10);
+  }
+}
+
 void ViewerWidget::initShaders() {
   // Compile vertex shader
   if (!shaders_.addShaderFromSourceFile(QOpenGLShader::Vertex,
@@ -71,69 +118,33 @@ void ViewerWidget::initShaders() {
   if (!shaders_.bind()) close();
 }
 
-void ViewerWidget::resizeGL(int w, int h) {
-  // Calculate aspect ratio
-  qreal aspect = qreal(w) / qreal(h ? h : 1);
+void ViewerWidget::resizeGL(int w, int h) { SetupProjection(w, h); }
 
-  // Set near plane to 3.0, far plane to 7.0, field of view 45 degrees
-  const qreal zNear = 0.1, zFar = 10000.0, fov = 70.0;
-  // Reset projection
-  projection_.setToIdentity();
-
-  // Set perspective projection
-  if (projection_type_ == 0) {
-    projection_.perspective(fov, static_cast<float>(aspect),
-                            static_cast<float>(zNear), zFar);
-  } else {
-    projection_.ortho(static_cast<float>(-aspect), static_cast<float>(aspect),
-                      -1.0, 1.0, static_cast<float>(zNear), zFar);
-  }
-}
+void ViewerWidget::ObserverUpdate() { update(); };
 
 void ViewerWidget::paintGL() {
   glClearColor(background_color_.redF(), background_color_.greenF(),
                background_color_.blueF(), background_color_.alphaF());
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-  // Draw lines
-  if (edges_type_ == 0) {
-    glDisable(GL_LINE_STIPPLE);
-    glEnable(GL_LINES);
-  } else if (edges_type_ == 1) {
-    glLineStipple(5, 0x00FF);
-    glEnable(GL_LINE_STIPPLE);
-  }
-
-  // Draw dots
-  if (vertices_type_ == 0) {
-    glDisable(GL_POINT_SMOOTH);
-  } else {
-    if (vertices_type_ == 1) {
-      glEnable(GL_POINT_SMOOTH);
-    } else if (vertices_type_ == 2) {
-      glDisable(GL_POINT_SMOOTH);
-    }
-    glPointSize(vertices_size_);
-    glUniform4f(LINES_BIND_LOC, vertices_color_.redF(),
-                vertices_color_.greenF(), vertices_color_.blueF(),
-                vertices_color_.alphaF());
-  }
-
-  glLineWidth(edges_thickness_);
-  glUniform4f(LINES_BIND_LOC, edges_color_.redF(), edges_color_.greenF(),
-              edges_color_.blueF(), edges_color_.alphaF());
-
+  int color_location = shaders_.uniformLocation("color");
+  Q_ASSERT(color_location != -1);
   for (auto &figure : figures_) {
-    figure.get()->BindData();
-    figure.get()->Draw();
+    figure.get()->BindData(shaders_, projection_);
+    figure.get()->DrawLines(shaders_, edges_type_, edges_color_, color_location,
+                            edges_thickness_);
+    figure.get()->DrawPoints(shaders_, vertices_type_, vertices_color_,
+                             color_location, vertices_size_);
   }
+
+  GifCreation();
 }
 
 void ViewerWidget::LoadModel(QString path) {
   if (path.length()) {
     figures_.clear();
     figures_.shrink_to_fit();
-    figures_.push_back(
-        std::make_unique<s21::Figure>(path.toStdString(), parser_, *this));
+    figures_.push_back(std::make_unique<s21::Figure>(
+        path.toStdString(), *dynamic_cast<QOpenGLFunctions *>(this)));
+    figures_.at(figures_.size() - 1).get()->AddObserver(this);
   }
 }

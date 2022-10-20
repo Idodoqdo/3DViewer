@@ -20,17 +20,37 @@ void Parser::Parse(std::string path) {
 
 void Parser::Clear() {
   vertices_.clear();
-  vertices_.shrink_to_fit();
   edges_.clear();
-  edges_.shrink_to_fit();
+  min_max_.clear();
+}
+
+void Parser::ScanMinMax(float val, std::pair<float, float> *min_max) {
+  if (min_max->first > val) min_max->first = val;
+  if (min_max->second < val) min_max->second = val;
+}
+
+float Parser::GetNormalized() const {
+  float lenX = min_max_.at(0).second - min_max_.at(0).first;
+  float lenY = min_max_.at(1).second - min_max_.at(1).first;
+  float lenZ = min_max_.at(2).second - min_max_.at(2).first;
+  float result = std::fmax(lenX, std::fmax(lenY, lenZ));
+  return result;
 }
 
 void Parser::ScanVertices(std::string line) {
   float x = 0, y = 0, z = 0;
   sscanf(line.c_str(), "v %f %f %f", &x, &y, &z);
+  if (min_max_.empty()) {  //  начальная инициализация лимитов
+    min_max_.push_back(std::pair<float, float>(x, x));
+    min_max_.push_back(std::pair<float, float>(y, y));
+    min_max_.push_back(std::pair<float, float>(z, z));
+  }
   vertices_.push_back(x);
   vertices_.push_back(y);
   vertices_.push_back(z);
+  ScanMinMax(x, &min_max_.at(0));  //  поиск лимитов
+  ScanMinMax(y, &min_max_.at(1));
+  ScanMinMax(z, &min_max_.at(2));
 }
 
 void Parser::ScanEdge(std::string line) {

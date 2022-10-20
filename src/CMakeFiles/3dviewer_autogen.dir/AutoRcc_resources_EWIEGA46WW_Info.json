@@ -1,0 +1,28 @@
+{
+	"BUILD_DIR" : "D:/c++/CPP4_3DViewer_v2.0-0/src/3dviewer_autogen",
+	"CMAKE_BINARY_DIR" : "D:/c++/CPP4_3DViewer_v2.0-0/src",
+	"CMAKE_CURRENT_BINARY_DIR" : "D:/c++/CPP4_3DViewer_v2.0-0/src",
+	"CMAKE_CURRENT_SOURCE_DIR" : "D:/c++/CPP4_3DViewer_v2.0-0/src",
+	"CMAKE_SOURCE_DIR" : "D:/c++/CPP4_3DViewer_v2.0-0/src",
+	"INCLUDE_DIR" : "D:/c++/CPP4_3DViewer_v2.0-0/src/3dviewer_autogen/include",
+	"INPUTS" : 
+	[
+		"D:/c++/CPP4_3DViewer_v2.0-0/src/images/gif.png",
+		"D:/c++/CPP4_3DViewer_v2.0-0/src/shaders/fshader.glsl",
+		"D:/c++/CPP4_3DViewer_v2.0-0/src/images/rec.png",
+		"D:/c++/CPP4_3DViewer_v2.0-0/src/shaders/vshader.glsl",
+		"D:/c++/CPP4_3DViewer_v2.0-0/src/objs/teapot.obj",
+		"D:/c++/CPP4_3DViewer_v2.0-0/src/images/images.png",
+		"D:/c++/CPP4_3DViewer_v2.0-0/src/images/app.png"
+	],
+	"LOCK_FILE" : "D:/c++/CPP4_3DViewer_v2.0-0/src/CMakeFiles/3dviewer_autogen.dir/AutoRcc_resources_EWIEGA46WW_Lock.lock",
+	"MULTI_CONFIG" : false,
+	"OPTIONS" : [ "-name", "resources" ],
+	"OUTPUT_CHECKSUM" : "EWIEGA46WW",
+	"OUTPUT_NAME" : "qrc_resources.cpp",
+	"RCC_EXECUTABLE" : "C:/msys64/mingw64/share/qt6/bin/rcc.exe",
+	"RCC_LIST_OPTIONS" : [ "--list" ],
+	"SETTINGS_FILE" : "D:/c++/CPP4_3DViewer_v2.0-0/src/CMakeFiles/3dviewer_autogen.dir/AutoRcc_resources_EWIEGA46WW_Used.txt",
+	"SOURCE" : "D:/c++/CPP4_3DViewer_v2.0-0/src/resources.qrc",
+	"VERBOSITY" : 0
+}

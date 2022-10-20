@@ -25,12 +25,17 @@ class MainWindow : public QMainWindow {
   ~MainWindow();
 
  private:
+  void SaveSettings();
+  void LoadSettings();
+  void ApplySettings();
   void ConnectToSignals();
   void OpenFile(QString path);
   void InitValidators();
   void SetLabelPixmap(QLabel *label, QColor color);
   void OnChange(QLineEdit *line, QSlider *slider,
                 void (ViewerWidget::*ptrMoveFunc)(float));
+  void LoadDefaultFigure();
+  void SetDefaultSliders();
 
   ViewerWidget *gl_widget_ = nullptr;
   QColor bg_color_ = {};
@@ -41,9 +46,6 @@ class MainWindow : public QMainWindow {
 
  private slots:
   void OnWidgetLoad();
-  void SaveSettings();
-  void LoadSettings();
-  void ApplySettings();
   void OnOpenFilePressed();
   void OnProjectionTypeChange();
   void OnBGColorPressed();

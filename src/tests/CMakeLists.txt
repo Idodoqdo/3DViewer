@@ -45,9 +45,9 @@ if (GTEST_FOUND)
     set_property(
         TARGET unit_tests
         APPEND
-        PROPERTY ADDITIONAL_CLEAN_FILES Temporary Testing TAG coverage ${TEST_CLEAN_FILES}
+        PROPERTY ADDITIONAL_CLEAN_FILES Temporary Testing TAG ${CMAKE_BINARY_DIR}/coverage ${TEST_CLEAN_FILES}
     )
-    add_test(MODEL_UNIT_TESTS unit_tests)
+    add_test(3DVIEWER_UNIT_TESTS unit_tests)
 endif()
 
 #############################################################
@@ -76,8 +76,8 @@ endif()
 #############################################################
 if (GTEST_FOUND)
         add_custom_target(memcheck
-            COMMAND CK_FORK=no leaks --atExit --  ${CMAKE_BINARY_DIR}/unit_tests
-            WORKING_DIRECTORY "${CMAKE_BINARY_DIR}")
+            COMMAND CK_FORK=no leaks --atExit --  ${CMAKE_CURRENT_BINARY_DIR}/unit_tests
+            WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
         add_dependencies(memcheck unit_tests)
 
     # Proper way but there are still reachable blocks

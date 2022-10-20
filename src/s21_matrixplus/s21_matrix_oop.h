@@ -18,7 +18,7 @@ class S21Matrix {
       @param rows Rows in the matrix
       @param cols Columns in the matrix
   */
-  S21Matrix(int rows, int cols);
+  S21Matrix(unsigned int rows, unsigned int cols);
   /**
       @brief Construct a new S21Matrix object using raw data from array of
      doubles
@@ -27,7 +27,7 @@ class S21Matrix {
       @param rows number of rows
       @param cols number of columns
   */
-  S21Matrix(double* raw_data, int rows, int cols);
+  S21Matrix(double* raw_data, unsigned int rows, unsigned int cols);
 
   /**
       @brief Copy constructor
@@ -201,26 +201,26 @@ class S21Matrix {
       @brief Sets the rows field and reallocs matrix accordingly
       @param new_rows New amount of rows
   */
-  void setRows(const int new_rows);
+  void setRows(const unsigned int new_rows);
 
   /**
       @brief Sets the columns field and reallocs matrix accordingly
 
       @param new_columns
   */
-  void setColumns(const int new_columns);
+  void setColumns(const unsigned int new_columns);
 
   /**
       @brief Get the rows field
-      @return int : Rows
+      @return unsigned int : Rows
   */
-  int getRows() const { return _rows; }
+  unsigned int getRows() const { return _rows; }
 
   /**
       @brief Get the columns field
-      @return int : Columns
+      @return unsigned int : Columns
   */
-  int getColumns() const { return _columns; }
+  unsigned int getColumns() const { return _columns; }
 
   /**
       @brief Checks if matrix is square
@@ -233,13 +233,20 @@ class S21Matrix {
       @brief Prints matrix
 
   */
-
   void Print();
+
+  /**
+      @brief Get the Identity Matrix object
+
+      @param size
+      @return S21Matrix
+  */
+  static S21Matrix GetIdentityMatrix(const unsigned int size);
 
  private:
   double** _matrix = {nullptr};
-  int _rows = {0};
-  int _columns = {0};
+  unsigned int _rows = {0};
+  unsigned int _columns = {0};
 
   /**
       @brief Allocates memory for matrix
@@ -251,7 +258,7 @@ class S21Matrix {
       With total size (sizeof(double*) * rows + (sizeof(double) * columns *
      rows))
   */
-  double** AllocateMemory(int rows, int cols) const;
+  double** AllocateMemory(unsigned int rows, unsigned int cols) const;
 
   /**
       @brief Helper method for addition and substraction, made to avoid code
@@ -271,7 +278,7 @@ class S21Matrix {
       @param column index of column to remove
       @return S21Matrix : Result of removal
   */
-  S21Matrix GetMinorMatrix(int row, int column);
+  S21Matrix GetMinorMatrix(unsigned int row, unsigned int column);
 
   /**
       @brief Get the Resized matrix memory block
@@ -281,7 +288,7 @@ class S21Matrix {
       @return double** : Dynnamically allocated matrix
   */
 
-  double** GetResizedMatrix(int rows, int columns) const;
+  double** GetResizedMatrix(unsigned int rows, unsigned int columns) const;
   /**
       @brief Frees memory used for storing matrix
 

@@ -7,10 +7,11 @@ TEST(parser, test1) {
   P.Parse("../objs/cube.obj");
   ASSERT_EQ(P.GetVertices().size(), 24);
   ASSERT_EQ(P.GetEdges().size(), 24);
+}
 
-  std::unique_ptr<s21::ParserController> transmitter_;
-  transmitter_ = std::make_unique<s21::ParserController>();
-  transmitter_->Parse("../objs/cube.obj");
-  ASSERT_EQ(transmitter_->GetVertices().size(), 24);
-  ASSERT_EQ(transmitter_->GetEdges().size(), 24);
+TEST(parser, test2) {
+  s21::ParserController::GetInstance().Parse("../objs/cube.obj");
+  s21::ParserController::GetInstance().GetNormalized();
+  ASSERT_EQ(s21::ParserController::GetInstance().GetVertices().size(), 24);
+  ASSERT_EQ(s21::ParserController::GetInstance().GetEdges().size(), 24);
 }
